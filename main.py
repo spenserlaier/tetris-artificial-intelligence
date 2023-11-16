@@ -36,6 +36,7 @@ pygame.time.set_timer(GAME_TIMER, 200)  # 1000 milliseconds = 1 second
 
 occupied_coordinates = set()
 colors_at_coordinates = dict()
+piece_color = colors.get_random_piece_color()
 
 while True:
     screen.fill(colors.gray)
@@ -53,25 +54,30 @@ while True:
                     occupied_coordinates.add(piece_coords)
                     colors_at_coordinates[piece_coords] = piece_color
                 piece_cartesian_coordinates = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
+                piece_color = colors.get_random_piece_color()
             else:
                 piece_cartesian_coordinates = pieces.move_down(piece_cartesian_coordinates)
     piece_pixel_coordinates = {BOARD_PIXEL_COORDINATES[p[0]][p[1]]
                                for p in piece_cartesian_coordinates}
-    for row in BOARD_CARTESIAN_COORDINATES:
-        for col in row:
-            var = 5
-    for pos_row in BOARD_PIXEL_COORDINATES:
-        for pos in pos_row:
-            if pos not in piece_pixel_coordinates:
+    print(BOARD_CARTESIAN_COORDINATES)
+    for row in range(len(BOARD_CARTESIAN_COORDINATES)):
+        for col in range(len(BOARD_CARTESIAN_COORDINATES[0])):
+            pixel_row, pixel_col = BOARD_PIXEL_COORDINATES[row][col]
+            if (row, col) in piece_cartesian_coordinates:
+                pixel_color = piece_color
+
+                pygame.draw.rect(screen, 
+                                 pixel_color,
+                                 (pixel_row, pixel_col, BOARD_SQUARE_SIZE-1, BOARD_SQUARE_SIZE-1))
+            elif (row, col) in occupied_coordinates:
+                pixel_color = colors_at_coordinates[(row, col)]
+                pygame.draw.rect(screen, 
+                                 pixel_color,
+                                 (pixel_row, pixel_col, BOARD_SQUARE_SIZE-1, BOARD_SQUARE_SIZE-1))
+            else:
                 pygame.draw.rect(screen, 
                                  colors.black, 
-                                 (pos[0], pos[1], BOARD_SQUARE_SIZE-1, BOARD_SQUARE_SIZE-1))
-
-            else:
-                # print("detected")
-                pygame.draw.rect(screen,
-                                 colors.green,
-                                 (pos[0], pos[1], BOARD_SQUARE_SIZE-1, BOARD_SQUARE_SIZE-1))
+                                 (pixel_row, pixel_col, BOARD_SQUARE_SIZE-1, BOARD_SQUARE_SIZE-1))
     # Update the display
     pygame.display.flip()
     # Control the frame rate
