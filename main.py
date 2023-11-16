@@ -71,6 +71,7 @@ def draw_board(piece, occupied_coordinates):
 while True:
     screen.fill(colors.gray)
 
+    occupied_coordinates = board_logic.clear_rows(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -125,6 +126,7 @@ while True:
         current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
         piece_color = colors.get_random_piece_color()
         continue
+
     piece_pixel_coordinates = {BOARD_PIXEL_COORDINATES[p[0]][p[1]]
                                for p in current_piece.coordinates}
     #print(BOARD_CARTESIAN_COORDINATES)
