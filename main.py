@@ -30,7 +30,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 #random_piece_func = random.choice(PIECE_GENERATOR_FUNCTIONS)
 #piece_cartesian_coordinates = random_piece_func(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
-piece_cartesian_coordinates = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
+current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
 GAME_TIMER = pygame.USEREVENT + 1
 pygame.time.set_timer(GAME_TIMER, 200)  # 1000 milliseconds = 1 second
 
@@ -48,22 +48,25 @@ while True:
             print("game timer detected")
             print(occupied_coordinates)
             board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
-            if pieces.detect_collision(piece_cartesian_coordinates, board_column_heights):
+            if pieces.detect_overlap(current_piece.coordinates, board_column_heights):
+                print("game over")
+                pygame.quit()
+            if pieces.detect_collision(current_piece.coordinates, board_column_heights):
                 print("collision detected")
-                for piece_coords in piece_cartesian_coordinates:
+                for piece_coords in current_piece.coordinates:
                     occupied_coordinates.add(piece_coords)
                     colors_at_coordinates[piece_coords] = piece_color
-                piece_cartesian_coordinates = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
+                current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
                 piece_color = colors.get_random_piece_color()
             else:
-                piece_cartesian_coordinates = pieces.move_down(piece_cartesian_coordinates)
+                current_piece.coordinates = pieces.move_down(current_piece.coordinates)
     piece_pixel_coordinates = {BOARD_PIXEL_COORDINATES[p[0]][p[1]]
-                               for p in piece_cartesian_coordinates}
+                               for p in current_piece.coordinates}
     print(BOARD_CARTESIAN_COORDINATES)
     for row in range(len(BOARD_CARTESIAN_COORDINATES)):
         for col in range(len(BOARD_CARTESIAN_COORDINATES[0])):
             pixel_row, pixel_col = BOARD_PIXEL_COORDINATES[row][col]
-            if (row, col) in piece_cartesian_coordinates:
+            if (row, col) in current_piece.coordinates:
                 pixel_color = piece_color
 
                 pygame.draw.rect(screen, 
