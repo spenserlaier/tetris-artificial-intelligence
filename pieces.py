@@ -8,30 +8,70 @@ class Piece:
         self.rotation = rotation
         self.anchor_point = anchor_point
     def rotate_around(self, anchor_point, current_point):
-        translated_point = (current_point[0] - anchor_point[0], current_point[1] - anchor_point[1])
-        rotated_point = (-translated_point[1], translated_point[0])
-        final_point = (rotated_point[0] + anchor_point[0], rotated_point[1] + anchor_point[1])
+        anchor_row = anchor_point[0]
+        anchor_col = anchor_point[1]
+
+        row_diff = anchor_point[0] - current_point[0]
+        col_diff = anchor_point[1] - current_point[1]
+
+        new_row = int(anchor_row + col_diff)
+        new_col = int(anchor_col - row_diff)
+
+        return (new_row, new_col)
+
+
+
+
         return final_point
-    def rotate_all(self, old_coordinates, anchor_point):
+    def rotate_all(self, old_coordinates):
         new_coordinates = set()
         for point in old_coordinates:
-            new_coordinates.add(self.rotate_around(anchor_point, point))
+            new_coordinates.add(self.rotate_around(self.anchor_point, point))
+        return new_coordinates
     def check_valid_coordinates(self, new_coordinates, occupied_coordinates, max_rows, max_cols):
         for point in new_coordinates:
             row_in_range = 0 <= point[0] < max_rows
+            if not row_in_range:
+                print(f"row not in range: row was {point[0]}, max is {max_rows}")
             col_in_range = 0 <= point[1] < max_cols
+            if not col_in_range:
+                print(f"col not in range: col was {point[1]}, max is {max_cols}")
             not_occupied = point not in occupied_coordinates
+            if not not_occupied:
+                print("coordinates are already occupied")
             valid_coord = row_in_range and col_in_range and not_occupied
             if not valid_coord:
                 return False
         return True
     def rotate_self(self, occupied_coordinates, max_rows, max_cols):
-        # all shapes except stick have a straightforward anchor point where
-        # the rotate_around function can be applied
-        new_coordinates = self.rotate_all(self.coordinates, self.anchor_point)
         if self.piece_type == "box":
             return
+        new_coordinates = self.rotate_all(self.coordinates)
         if self.check_valid_coordinates(new_coordinates, occupied_coordinates, max_rows, max_cols):
+            self.coordinates = new_coordinates
+        else:
+            print("tried to rotate, but invalid coordinates")
+    def move_self(self, direction, occupied_coordinates, max_rows, max_cols):
+        new_coordinates = set()
+        match direction:
+            case "left":
+                for row, col in self.coordinates:
+                    new_coordinates.add(row, col-1)
+                break
+            case "right": 
+                for row, col in self.coordinates:
+                    new_coordinates.add(row, col+1)
+                break
+            case "down":
+                for row, col in self.coordinates:
+                    new_coordinates.add(row-1, col)
+                break
+            case _:
+                print("invalid direction provided. this shouldn't happen")
+                break
+        print("checking new coordinates before moving piece...")
+        if self.check_valid_coordinates(new_coordinates, occupied_coordinates, max_rows, max_cols):
+            print("check successful. moving the piece")
             self.coordinates = new_coordinates
     def move_self(self, new_coordinates, new_anchor_point):
         self.coordinates = new_coordinates
@@ -80,7 +120,9 @@ def generate_box(starting_row, starting_col):
     positions.add((starting_row+1, starting_col))
     positions.add((starting_row+1, starting_col+ 1))
     
-    anchor_point = None
+    anchor_point = (starting_row, starting_col)
+    #TODO: add actual box anchor point. it's not used because rotation doesn't affect box,
+    #but it may be needed in the future
     piece =  Piece(positions, "box", 0, anchor_point)
     return piece
 
@@ -92,7 +134,7 @@ def generate_s(starting_row, starting_col):
     positions.add((starting_row+1, starting_col-1))
 
     anchor_point = (starting_row+1, starting_col)
-    piece =  Piece(positions, "box", 0, anchor_point)
+    piece =  Piece(positions, "s", 0, anchor_point)
     return piece
 
 def generate_z(starting_row, starting_col):
@@ -103,7 +145,7 @@ def generate_z(starting_row, starting_col):
     positions.add((starting_row+1, starting_col+1))
 
     anchor_point = (starting_row+1, starting_col)
-    piece =  Piece(positions, "box", 0, anchor_point)
+    piece =  Piece(positions, "z", 0, anchor_point)
     return piece
 
 
@@ -115,21 +157,21 @@ def generate_t(starting_row, starting_col):
     positions.add((starting_row + 1, starting_col))
 
     anchor_point = (starting_row, starting_col)
-    piece =  Piece(positions, "box", 0, anchor_point)
+    piece =  Piece(positions, "t", 0, anchor_point)
     #return positions
     return piece
 
 def detect_collision(piece_coordinates, board_height_at_col):
     for piece_row, piece_col in piece_coordinates:
         if board_height_at_col[piece_col] == piece_row + 1:
-            print(piece_coordinates, board_height_at_col[piece_col])
+            #print(piece_coordinates, board_height_at_col[piece_col])
             return True
     return False
 
 def detect_overlap(piece_coordinates, board_height_at_col):
     for piece_row, piece_col in piece_coordinates:
         if board_height_at_col[piece_col] == piece_row:
-            print(piece_coordinates, board_height_at_col[piece_col])
+            #print(piece_coordinates, board_height_at_col[piece_col])
             return True
     return False
 

@@ -26,5 +26,6 @@ def get_column_heights(num_rows, occupied_coordinates):
     max_height_at_column = collections.defaultdict(lambda: num_rows)
     for row, col in occupied_coordinates:
         max_height_at_column[col] = min(max_height_at_column[col], row)
-    print(max_height_at_column)
+    #print(max_height_at_column)
     return max_height_at_column
+

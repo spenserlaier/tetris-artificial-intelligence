@@ -46,8 +46,11 @@ while True:
             sys.exit()
         if event.type == GAME_TIMER:
             print("game timer detected")
-            print(occupied_coordinates)
+            #print(occupied_coordinates)
             board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
+            perform_rotate = True
+            if perform_rotate:
+                current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
             if pieces.detect_overlap(current_piece.coordinates, board_column_heights):
                 print("game over")
                 pygame.quit()
@@ -59,10 +62,13 @@ while True:
                 current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
                 piece_color = colors.get_random_piece_color()
             else:
+                #TODO: anchor point isn't getting updated, and it's preventing rotations after a certain point
+                # we need to update the move functions so that they also update the anchor point
                 current_piece.coordinates = pieces.move_down(current_piece.coordinates)
+                current_piece.anchor_point = (current_piece.anchor_point[0] + 1, current_piece.anchor_point[1])
     piece_pixel_coordinates = {BOARD_PIXEL_COORDINATES[p[0]][p[1]]
                                for p in current_piece.coordinates}
-    print(BOARD_CARTESIAN_COORDINATES)
+    #print(BOARD_CARTESIAN_COORDINATES)
     for row in range(len(BOARD_CARTESIAN_COORDINATES)):
         for col in range(len(BOARD_CARTESIAN_COORDINATES[0])):
             pixel_row, pixel_col = BOARD_PIXEL_COORDINATES[row][col]
