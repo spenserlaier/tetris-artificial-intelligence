@@ -14,14 +14,19 @@ def generate_board_square_positions(board, starting_x, starting_y, square_size):
         rec_positions.append(curr_row)
     return rec_positions
 
-def clear_rows(occupied_coordinates, num_rows, num_cols):
+def init_next_piece_display(rows=5, cols=5):
+    return [[0 for _ in range(cols)]for _ in range(rows)]
+
+def clear_rows(occupied_coordinates, num_rows, num_cols, colors_at_coordinates):
     blocks_in_row = collections.defaultdict(lambda: 0)
     for row, col in occupied_coordinates:
         blocks_in_row[row] += 1
     rows_to_remove = set()
+    score = 0
     for i in range(0, num_rows):
         if blocks_in_row[i] == num_cols:
             rows_to_remove.add(i)
+            score += num_cols
     downward_shifts = collections.defaultdict(lambda: 0)
     # how much does each row need to be shifted down? default 0
     cnt = 0
@@ -31,12 +36,14 @@ def clear_rows(occupied_coordinates, num_rows, num_cols):
         else:
             downward_shifts[i] = cnt
     new_coordinates = set()
+    new_colors = dict()
     for row, col in occupied_coordinates:
         if row in rows_to_remove:
             continue
         else:
             new_coordinates.add((row + downward_shifts[row], col))
-    return new_coordinates
+            new_colors[(row + downward_shifts[row], col)] = colors_at_coordinates[(row, col)]
+    return (new_coordinates, new_colors, score)
 
         
 
