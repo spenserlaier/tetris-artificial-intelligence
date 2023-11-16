@@ -1,6 +1,8 @@
 import pygame
 import sys
 import tetris
+import pieces
+import random
 
 
 def generate_board_square_positions(board, starting_x, starting_y, square_size):
@@ -24,6 +26,7 @@ screen = pygame.display.set_mode((width, height))
 box_width, box_height = 50, 50
 box_x, box_y = (width - box_width) // 2, (height - box_height) // 2
 red = (255, 0, 0)
+black = (0, 0, 0)
 
 board = tetris.init_board(20, 10)
 positions = generate_board_square_positions(board, 10, 10, square_size=10)
@@ -32,18 +35,28 @@ for row in positions:
         print(col)
 for row in board:
     print(row)
+
+generator_functions = pieces.piece_generator_functions
+square_size = 10
+positions = generate_board_square_positions(board, 
+                                            10, 
+                                            10, 
+                                            square_size)
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
 
-    screen.fill((255, 255, 255))
-    square_size = 10
-    positions = generate_board_square_positions(board, 10, 10, square_size)
+    screen.fill((50, 50, 50))
+    random_piece_func = random.choice(generator_functions)
+    piece_positions = random_piece_func()
     for pos_row in positions:
         for pos in pos_row:
-            pygame.draw.rect(screen, red, (pos[0], pos[1], square_size-1, square_size-1))
+            pygame.draw.rect(screen, 
+                             black, 
+                             (pos[0], pos[1], square_size-1, square_size-1))
+
 
     # Update the display
     pygame.display.flip()
