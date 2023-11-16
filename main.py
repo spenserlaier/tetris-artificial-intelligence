@@ -75,7 +75,7 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == GAME_TIMER:
+        elif event.type == GAME_TIMER:
             print("game timer detected")
             #print(occupied_coordinates)
             board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
@@ -98,24 +98,25 @@ while True:
                 piece_color = colors.get_random_piece_color()
             else:
                 current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_w] or keys[pygame.K_UP]:
-        current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-        draw_board(current_piece, occupied_coordinates)
-        print("Up key pressed")
-    elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-        current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-        draw_board(current_piece, occupied_coordinates)
-        print("Down key pressed")
-    elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        print("Left key pressed")
-        current_piece.move_self("left", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-        draw_board(current_piece, occupied_coordinates)
-    elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-        current_piece.move_self("right", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-        draw_board(current_piece, occupied_coordinates)
-        print("Right key pressed")
-    board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
+        elif event.type == pygame.KEYDOWN:
+            # Check for keypresses
+            if event.key == pygame.K_w or event.key == pygame.K_UP:
+                current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+                draw_board(current_piece, occupied_coordinates)
+                print("Up key pressed")
+            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+                draw_board(current_piece, occupied_coordinates)
+                print("Down key pressed")
+            elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                print("Left key pressed")
+                current_piece.move_self("left", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+                draw_board(current_piece, occupied_coordinates)
+            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                current_piece.move_self("right", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+                draw_board(current_piece, occupied_coordinates)
+                print("Right key pressed")
+    #board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
     #if pieces.detect_collision(current_piece.coordinates, board_column_heights):
     if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
         for piece_coords in current_piece.coordinates:
