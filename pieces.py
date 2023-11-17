@@ -19,10 +19,6 @@ class Piece:
 
         return (new_row, new_col)
 
-
-
-
-        return final_point
     def rotate_all(self, old_coordinates):
         new_coordinates = set()
         for point in old_coordinates:
@@ -94,7 +90,7 @@ def generate_reversed_l(starting_row, starting_col):
     positions.add((starting_row +2, starting_col - 1))
 
     anchor_point = (starting_row+1, starting_col)
-    piece =  Piece(positions, "regular_l", 0, anchor_point)
+    piece =  Piece(positions, "reversed_l", 0, anchor_point)
     return piece
 
 def generate_stick(starting_row, starting_col):
@@ -105,7 +101,7 @@ def generate_stick(starting_row, starting_col):
     positions.add((starting_row + 3, starting_col ))
 
     anchor_point = (starting_row+1.5, starting_col+0.5)
-    piece =  Piece(positions, "reversed_l", 0, anchor_point)
+    piece =  Piece(positions, "stick", 0, anchor_point)
     return piece
 
 

@@ -20,6 +20,9 @@ def get_piece_type(piece):
         out[6] = 1
     return numpy.array(out)
 
+def get_time(current_time):
+    return numpy.array(current_time)
+
 def generate_board_array(rows, cols, occupied_coords):
     single_row = [0]*cols
     out = [single_row for _ in range(rows)]
@@ -28,7 +31,6 @@ def generate_board_array(rows, cols, occupied_coords):
             if (row, col) in occupied_coords:
                 out[row][col] = 1
     out = numpy.array(out).flatten()
-
     return out
 
 def get_piece_coordinates(piece):
@@ -38,8 +40,6 @@ def get_piece_coordinates(piece):
 
 def get_normalized_piece_coordinates(piece):
     sorted_coords = sorted(list(piece.coordinates))
-    # needs to be flattened
-    # TODO: consider normalization (maybe a separate method that generated normalized coords?)
     flattened_coords = numpy.array(sorted_coords).flatten()
     normalized_coords = flattened_coords / max(flattened_coords.max(), 1)
     return normalized_coords

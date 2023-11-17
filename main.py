@@ -39,17 +39,11 @@ PIECE_GENERATOR_FUNCTIONS = pieces.piece_generator_functions
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-#random_piece_func = random.choice(PIECE_GENERATOR_FUNCTIONS)
-#piece_cartesian_coordinates = random_piece_func(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
 GAME_TIMER = pygame.USEREVENT + 1
 pygame.time.set_timer(GAME_TIMER, 1000)  # 1000 milliseconds = 1 second
 
 occupied_coordinates = set()
 colors_at_coordinates = dict()
-
-#TODO: colors are causing bugs. when we update positions during a row clear,
-# we also need to update the colors for those positions or else we'll end Up
-#with a keynotfound error
 
 def draw_board(piece, occupied_coordinates):
     piece_coordinates = piece.coordinates
@@ -119,6 +113,24 @@ next_piece_color = colors.get_random_piece_color()
 print(NEXT_PIECE_CARTESIAN_COORDINATES)
 print(NEXT_PIECE_PIXEL_COORDINATES)
 
+def compute_reward():
+    # TODO: consider how to handle score 
+    # reward = alpha * absolute_score + beta * score_increase -> we can use a combination of absolute and delta 
+    # score and combine it with some decay, or we can simply use one or the other
+    # reward factors:
+    # init reward as 0
+    # if score has increased, increase reward by 10
+    # if time == 1000 or score == 1000, increase reward by 50
+    # if game ends before time == 1000 or score == 1000, decrease reward by 50 
+    # if number of holes increases, decrease reward by 10
+    # if number of holes decreases, increase reward by 10
+    # if average height of coordinates increases, decrease by 5
+    # if average height of coordinates decreases, increase by 5 (is this redundant with row clears? consider
+        #excluding it)
+
+
+    return 5
+
 
 
 
@@ -136,7 +148,6 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit()
         elif event.type == GAME_TIMER:
             #print(occupied_coordinates)
             board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
