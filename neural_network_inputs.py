@@ -1,6 +1,8 @@
 import pieces
 import collections
-def generate_piece_type_vector(piece):
+import numpy
+
+def get_piece_type(piece):
     out = [0 for _ in range(7)] # 7 total pieces- use one-hot encoding
     if piece.piece_type == "regular_l":
         out[0] = 1
@@ -16,7 +18,31 @@ def generate_piece_type_vector(piece):
         out[5] = 1
     elif piece.piece_type == "stick":
         out[6] = 1
+    return numpy.array(out)
+
+def generate_board_array(rows, cols, occupied_coords):
+    single_row = [0]*cols
+    out = [single_row for _ in range(rows)]
+    for row in range(rows):
+        for col in range(cols):
+            if (row, col) in occupied_coords:
+                out[row][col] = 1
+    out = numpy.array(out).flatten()
+
     return out
+
+def get_piece_coordinates(piece):
+    out = sorted(list(piece.coordinates))
+    out = numpy.array(out).flatten()
+    return out
+
+def get_normalized_piece_coordinates(piece):
+    sorted_coords = sorted(list(piece.coordinates))
+    # needs to be flattened
+    # TODO: consider normalization (maybe a separate method that generated normalized coords?)
+    flattened_coords = numpy.array(sorted_coords).flatten()
+    normalized_coords = flattened_coords / max(flattened_coords.max(), 1)
+    return normalized_coords
 
 def count_holes(not_occupied):
     # we can count holes by performing a bfs on the coordinates that are 
@@ -49,4 +75,8 @@ def count_holes(not_occupied):
             d = (row +1, col)
             if d in not_occupied:
                 queue.append(d)
-    return holes
+    return numpy.array(holes)
+
+
+
+
