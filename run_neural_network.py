@@ -173,24 +173,24 @@ for episode in range(num_episodes):
                     next_piece_color = colors.get_random_piece_color()
                 else:
                     current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-            elif event.type == pygame.KEYDOWN:
-                # Check for keypresses
-                if event.key == pygame.K_w or event.key == pygame.K_UP:
-                    current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                    draw_board(current_piece, occupied_coordinates)
-                    print("Up key pressed")
-                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                    current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                    draw_board(current_piece, occupied_coordinates)
-                    print("Down key pressed")
-                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    print("Left key pressed")
-                    current_piece.move_self("left", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                    draw_board(current_piece, occupied_coordinates)
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    current_piece.move_self("right", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                    draw_board(current_piece, occupied_coordinates)
-                    print("Right key pressed")
+
+        # Check for keypresses
+        if action == 0:
+            current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+            draw_board(current_piece, occupied_coordinates)
+            print("Up key pressed")
+        elif action == 1:
+            current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+            draw_board(current_piece, occupied_coordinates)
+            print("Down key pressed")
+        elif action == 2:
+            print("Left key pressed")
+            current_piece.move_self("left", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+            draw_board(current_piece, occupied_coordinates)
+        elif action == 3:
+            current_piece.move_self("right", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+            draw_board(current_piece, occupied_coordinates)
+            print("Right key pressed")
         #board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
         #if pieces.detect_collision(current_piece.coordinates, board_column_heights):
         if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
