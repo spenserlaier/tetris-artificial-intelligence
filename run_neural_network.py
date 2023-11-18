@@ -153,15 +153,15 @@ def compute_reward(old_reward_state, new_reward_state):
     avg_row_width_increase = new_reward_state['max_row_width'] - old_reward_state['max_row_width']
     avg_row_width_increase = new_reward_state['avg_row_width'] - old_reward_state['avg_row_width']
     score_increase = new_reward_state['score_increase']
-    print(f"reward for reducing holes: {hole_reduction}")
-    print(f"reward for reducing max col height: {col_height_reduction}")
-    print(f"reward for reducing avg col height: {avg_col_height_reduction}")
-    print(f"reward for increasing avg row width: {avg_row_width_increase}")
-    print(f"reward for increasing max row width: {avg_row_width_increase}")
-    #print(f"biggest_col_diff: {biggest_col_diff}")
-    print(f"reward for increasing # of good rows (rows w 7+ blocks): {good_rows_increase}\r")
+#    print(f"reward for reducing holes: {hole_reduction}")
+#    print(f"reward for reducing max col height: {col_height_reduction}")
+#    print(f"reward for reducing avg col height: {avg_col_height_reduction}")
+#    print(f"reward for increasing avg row width: {avg_row_width_increase}")
+#    print(f"reward for increasing max row width: {avg_row_width_increase}")
+#    #print(f"biggest_col_diff: {biggest_col_diff}")
+#    print(f"reward for increasing # of good rows (rows w 7+ blocks): {good_rows_increase}\r")
     return (hole_reduction 
-            + col_height_reduction 
+            #+ col_height_reduction 
             + avg_col_height_reduction 
             + good_rows_increase
             + avg_row_width_increase
