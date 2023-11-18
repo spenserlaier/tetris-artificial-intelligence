@@ -61,6 +61,12 @@ def get_normalized_piece_coordinates(piece):
     normalized_coords = flattened_coords / max(flattened_coords.max(), 1)
     return normalized_coords
 
+def get_number_of_good_rows(occupied_coords):
+    blocks_in_rows = collections.defaultdict(lambda: 0)
+    for row, col in occupied_coords:
+        blocks_in_rows[row] += 1
+    good_rows = [key for key in blocks_in_rows.keys() if key >= 7]
+    return len(good_rows)
 
 def get_max_column_height(occupied_coords):
     column_counts = collections.defaultdict(lambda: 0)

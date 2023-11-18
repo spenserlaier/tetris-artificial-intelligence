@@ -117,7 +117,12 @@ def compute_reward(occupied_coordinates, added_score, moves_made):
     avg_height = neural_network_inputs.get_average_coord_height(occupied_coordinates, BOARD_ROWS)
     #print(f"holes detected: {holes}")
     max_col_height = neural_network_inputs.get_max_column_height(occupied_coordinates)
-    return added_score*5 - (holes) + math.log(moves_made) - avg_height - max_col_height*2
+    board_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
+    biggest_col_diff = max(board_heights.values()) - min(board_heights.values()) if board_heights else 0
+    #max_board_height = max(board_heights.keys()) if max_board_height else 0
+    occupied_space = math.log(len(occupied_coordinates)) if occupied_coordinates else 0
+    good_rows = neural_network_inputs.get_number_of_good_rows(occupied_coordinates)
+    return added_score*5 - (holes) + math.log(moves_made) - biggest_col_diff*2 + occupied_space - 2*max_col_height 
     #return 5
 
 
@@ -137,7 +142,7 @@ for episode in range(num_episodes):
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     GAME_TIMER = pygame.USEREVENT + 1
-    pygame.time.set_timer(GAME_TIMER, 1000)  # 1000 milliseconds = 1 second
+    #pygame.time.set_timer(GAME_TIMER, 1000)  # 1000 milliseconds = 1 second
     occupied_coordinates = set()
     colors_at_coordinates = dict()
     current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
@@ -159,8 +164,8 @@ for episode in range(num_episodes):
             print(f"Episode {episode + 1}/{num_episodes}, Total Reward: {total_reward}")
             done = True
             break
-        else:
-            current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
+        #else:
+            #current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
         occupied_coordinates, colors_at_coordinates, added_score = board_logic.clear_rows(occupied_coordinates, 
                                                                    BOARD_ROWS, 
                                                                    BOARD_COLS, 
