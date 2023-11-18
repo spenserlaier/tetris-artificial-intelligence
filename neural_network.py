@@ -21,9 +21,11 @@ class DQNAgent:
 
     def choose_action(self, state, exploration_prob):
         if numpy.random.rand() < exploration_prob:
-            action = numpy.random.choice(self.action_size)
+            action = int(numpy.random.choice(self.action_size))
+            return action
         else:
             q_values = self.model.predict(numpy.reshape(state, (1, self.state_size)))
+            #print("q_values: ")
             return numpy.argmax(q_values)
 
     def update_q_values(self, state, action, reward, next_state, done):

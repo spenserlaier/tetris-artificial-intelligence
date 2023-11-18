@@ -3,6 +3,7 @@ import sys
 import pieces
 import random
 import colors
+import math
 import board_logic
 import neural_network_inputs
 import neural_network
@@ -106,8 +107,17 @@ def draw_next_piece(piece, piece_color):
                                  colors.black,
                                  (pixel_row, pixel_col, BOARD_SQUARE_SIZE-1, BOARD_SQUARE_SIZE-1))
 
-def compute_reward():
-    return 5
+def compute_reward(occupied_coordinates, added_score, moves_made):
+    not_occupied = set()
+    for row in range(BOARD_ROWS):
+        for col in range(BOARD_COLS):
+            if (row, col) not in occupied_coordinates:
+                not_occupied.add((row, col))
+    holes = neural_network_inputs.count_holes(not_occupied)
+    avg_height = neural_network_inputs.get_average_coord_height(occupied_coordinates, BOARD_ROWS)
+    print(f"holes detected: {holes}")
+    return added_score*5 - (holes) + math.log(moves_made) - avg_height
+    #return 5
 
 
 print(NEXT_PIECE_CARTESIAN_COORDINATES)
@@ -131,50 +141,46 @@ for episode in range(num_episodes):
     piece_color = colors.get_random_piece_color()
     next_piece_color = colors.get_random_piece_color()
     score = 0
-    while True:
+    num_actions = 0
+    ACTIONS_PER_TICK = 16
+    done = False
+    while done == False:
         state = neural_network_inputs.generate_board_array(BOARD_ROWS, BOARD_COLS, occupied_coordinates)
         action = agent.choose_action(state, exploration_prob)
-
-        #next_state, reward, done = env.step(action) # in other words, execute the action in the game
-                                                    # and get the next set of data
+        num_actions += 1
         next_state = neural_network_inputs.generate_board_array(BOARD_ROWS, BOARD_COLS, occupied_coordinates)
-        reward = compute_reward()
-        if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
+        board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
+        if pieces.detect_overlap(current_piece.coordinates, board_column_heights):
             print(f"Episode {episode + 1}/{num_episodes}, Total Reward: {total_reward}")
             done = True
             break
-        state = next_state
-        total_reward += reward
-        screen.fill(colors.gray)
+        else:
+            current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
         occupied_coordinates, colors_at_coordinates, added_score = board_logic.clear_rows(occupied_coordinates, 
                                                                    BOARD_ROWS, 
                                                                    BOARD_COLS, 
                                                                    colors_at_coordinates)
+        reward = compute_reward(occupied_coordinates, added_score, num_actions)
+        state = next_state
+        total_reward += reward
+        screen.fill(colors.gray)
         score += added_score
         draw_next_piece(next_piece, next_piece_color)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            elif event.type == GAME_TIMER:
-                #print(occupied_coordinates)
-                board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
-                if pieces.detect_overlap(current_piece.coordinates, board_column_heights):
-                    print("game over")
-                    pygame.quit()
-                if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
-                    print("collision detected")
-                    for piece_coords in current_piece.coordinates:
-                        occupied_coordinates.add(piece_coords)
-                        colors_at_coordinates[piece_coords] = piece_color
-                    #current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
-                    current_piece = next_piece
-                    piece_color = next_piece_color
-                    next_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
-                    next_piece_color = colors.get_random_piece_color()
-                else:
-                    current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-
+        if num_actions % ACTIONS_PER_TICK == 0:
+            board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
+            if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
+                print("collision detected")
+                for piece_coords in current_piece.coordinates:
+                    occupied_coordinates.add(piece_coords)
+                    colors_at_coordinates[piece_coords] = piece_color
+                #current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
+                current_piece = next_piece
+                piece_color = next_piece_color
+                next_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
+                next_piece_color = colors.get_random_piece_color()
+                #board_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
         # Check for keypresses
+        print(f"current action: {action}")
         if action == 0:
             current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
             draw_board(current_piece, occupied_coordinates)
@@ -207,88 +213,3 @@ for episode in range(num_episodes):
                                    for p in current_piece.coordinates}
         #print(BOARD_CARTESIAN_COORDINATES)
         draw_board(current_piece, occupied_coordinates)
-
-
-
-
-
-
-        
-
-
-    
-
-
-
-
-score = 0
-while True:
-    #break
-    screen.fill(colors.gray)
-    occupied_coordinates, colors_at_coordinates, added_score = board_logic.clear_rows(occupied_coordinates, 
-                                                               BOARD_ROWS, 
-                                                               BOARD_COLS, 
-                                                               colors_at_coordinates)
-    score += added_score
-    draw_next_piece(next_piece, next_piece_color)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-        elif event.type == GAME_TIMER:
-            #print(occupied_coordinates)
-            board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
-            if pieces.detect_overlap(current_piece.coordinates, board_column_heights):
-                print("game over")
-                pygame.quit()
-            if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
-                print("collision detected")
-                for piece_coords in current_piece.coordinates:
-                    occupied_coordinates.add(piece_coords)
-                    colors_at_coordinates[piece_coords] = piece_color
-                #current_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
-                current_piece = next_piece
-                piece_color = next_piece_color
-                next_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
-                next_piece_color = colors.get_random_piece_color()
-            else:
-                current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-        elif event.type == pygame.KEYDOWN:
-            # Check for keypresses
-            if event.key == pygame.K_w or event.key == pygame.K_UP:
-                current_piece.rotate_self(occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                draw_board(current_piece, occupied_coordinates)
-                print("Up key pressed")
-            elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                current_piece.move_self("down", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                draw_board(current_piece, occupied_coordinates)
-                print("Down key pressed")
-            elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                print("Left key pressed")
-                current_piece.move_self("left", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                draw_board(current_piece, occupied_coordinates)
-            elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                current_piece.move_self("right", occupied_coordinates, BOARD_ROWS, BOARD_COLS)
-                draw_board(current_piece, occupied_coordinates)
-                print("Right key pressed")
-    #board_column_heights = board_logic.get_column_heights(BOARD_ROWS, occupied_coordinates)
-    #if pieces.detect_collision(current_piece.coordinates, board_column_heights):
-    if pieces.detect_collision(current_piece.coordinates, occupied_coordinates, BOARD_ROWS):
-        for piece_coords in current_piece.coordinates:
-            occupied_coordinates.add(piece_coords)
-            colors_at_coordinates[piece_coords] = piece_color
-        current_piece = next_piece
-        piece_color = next_piece_color
-        next_piece = pieces.generate_random_piece(BOARD_PIECE_STARTING_X, BOARD_PIECE_STARTING_Y)
-        next_piece_color = colors.get_random_piece_color()
-        continue
-
-    piece_pixel_coordinates = {BOARD_PIXEL_COORDINATES[p[0]][p[1]]
-                               for p in current_piece.coordinates}
-    #print(BOARD_CARTESIAN_COORDINATES)
-    draw_board(current_piece, occupied_coordinates)
-
-
-
-
-
-

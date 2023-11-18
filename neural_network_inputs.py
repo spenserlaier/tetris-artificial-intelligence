@@ -38,6 +38,13 @@ def get_piece_coordinates(piece):
     out = numpy.array(out).flatten()
     return out
 
+def get_average_coord_height(occupied_coordinates, max_rows):
+    total_row_heights = 0
+
+    for row, col in occupied_coordinates:
+        total_row_heights += (max_rows - row)
+    return total_row_heights // len(occupied_coordinates) if occupied_coordinates else 0
+
 def get_normalized_piece_coordinates(piece):
     sorted_coords = sorted(list(piece.coordinates))
     flattened_coords = numpy.array(sorted_coords).flatten()
@@ -62,18 +69,17 @@ def count_holes(not_occupied):
         while queue:
             row, col = queue.popleft()
             visited.add((row, col))
-            # get four directions-- currently_occupied and not_occupied should contain all coordinates
             l = (row, col-1)
-            if l in not_occupied:
+            if l in not_occupied and l not in visited:
                 queue.append(l)
             r = (row, col+1)
-            if r in not_occupied:
+            if r in not_occupied and r not in visited:
                 queue.append(r)
             u = (row -1, col)
-            if u in not_occupied:
+            if u in not_occupied and u not in visited:
                 queue.append(u)
             d = (row +1, col)
-            if d in not_occupied:
+            if d in not_occupied and d not in visited:
                 queue.append(d)
     return numpy.array(holes)
 
