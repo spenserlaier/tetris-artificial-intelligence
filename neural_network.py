@@ -27,6 +27,12 @@ class DQNAgent:
             q_values = self.model.predict(numpy.reshape(state, (1, self.state_size)))
             #print("q_values: ")
             return numpy.argmax(q_values)
+    def get_max_column_height(occupied_coords):
+        column_counts = collections.defaultdict(lambda: 0)
+        for row, col in occupied_coords:
+            column_counts[col] += 1
+        return max(column_counts.keys()) if column_counts else 0
+
 
     def update_q_values(self, state, action, reward, next_state, done):
         target = reward

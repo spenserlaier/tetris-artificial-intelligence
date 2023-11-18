@@ -38,6 +38,16 @@ def get_piece_coordinates(piece):
     out = numpy.array(out).flatten()
     return out
 
+def generate_input_state(rows, cols, occupied_coordinates, piece):
+    board_state = generate_board_array(rows, cols, occupied_coordinates)
+    piece_type = get_piece_type(piece)
+    piece_coords = get_piece_coordinates(piece)
+    normalized_coords = get_normalized_piece_coordinates(piece)
+    output_arr = numpy.concatenate((board_state, piece_type, piece_coords, normalized_coords))
+    # print(f"complete board state: {output_arr}")
+    return output_arr
+    
+
 def get_average_coord_height(occupied_coordinates, max_rows):
     total_row_heights = 0
 
@@ -50,6 +60,14 @@ def get_normalized_piece_coordinates(piece):
     flattened_coords = numpy.array(sorted_coords).flatten()
     normalized_coords = flattened_coords / max(flattened_coords.max(), 1)
     return normalized_coords
+
+
+def get_max_column_height(occupied_coords):
+    column_counts = collections.defaultdict(lambda: 0)
+    for row, col in occupied_coords:
+        column_counts[col] += 1
+    return max(column_counts.keys()) if column_counts else 0
+
 
 def count_holes(not_occupied):
     # we can count holes by performing a bfs on the coordinates that are 

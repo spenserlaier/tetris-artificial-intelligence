@@ -28,13 +28,16 @@ class Piece:
         for point in new_coordinates:
             row_in_range = 0 <= point[0] < max_rows
             if not row_in_range:
-                print(f"row not in range: row was {point[0]}, max is {max_rows}")
+                #print(f"row not in range: row was {point[0]}, max is {max_rows}")
+                pass
             col_in_range = 0 <= point[1] < max_cols
             if not col_in_range:
-                print(f"col not in range: col was {point[1]}, max is {max_cols}")
+                #print(f"col not in range: col was {point[1]}, max is {max_cols}")
+                pass
             not_occupied = point not in occupied_coordinates
             if not not_occupied:
-                print("coordinates are already occupied")
+                #print("coordinates are already occupied")
+                pass
             valid_coord = row_in_range and col_in_range and not_occupied
             if not valid_coord:
                 return False
@@ -46,7 +49,8 @@ class Piece:
         if self.check_valid_coordinates(new_coordinates, occupied_coordinates, max_rows, max_cols):
             self.coordinates = new_coordinates
         else:
-            print("tried to rotate, but invalid coordinates")
+            pass
+            #print("tried to rotate, but invalid coordinates")
     def move_self(self, direction, occupied_coordinates, max_rows, max_cols):
         new_coordinates = set()
         anchor_row, anchor_col = self.anchor_point
@@ -63,10 +67,11 @@ class Piece:
                 new_coordinates.add((row+1, col))
             new_anchor_point = (anchor_row + 1, anchor_col)
         else:
-            print("invalid direction provided. this shouldn't happen")
-        print("checking new coordinates before moving piece...")
+            #print("invalid direction provided. this shouldn't happen")
+            pass
+        #print("checking new coordinates before moving piece...")
         if self.check_valid_coordinates(new_coordinates, occupied_coordinates, max_rows, max_cols):
-            print("check successful. moving the piece")
+            #print("check successful. moving the piece")
             self.coordinates = new_coordinates
             self.anchor_point = new_anchor_point
 def generate_regular_l(starting_row, starting_col):
